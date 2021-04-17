@@ -1,25 +1,43 @@
-import logo from './logo.svg';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Router, Route, Switch } from 'react-router-dom'
+
+import { history } from './helpers/history'
+
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+
+  constructor(props) {
+    super(props)
+
+    history.listen((location, actions) =>{
+      this.props.clearAlerts()
+    })
+  }
+
+  render() {
+    return (
+      <div className="App h-100">
+        <Router history={history} >
+          <Switch>
+            <Route exact path='/' component={Welcome} />
+            <Route exact path='/login' component={Login} />
+            <Route exact path='/signup' component={Signup} />
+            <PrivateRoute path='/' component={PrivateRoutesContainer} />
+          </Switch>
+        </Router>
+      </div>
+    )
+  }
+
 }
 
-export default App;
+const mapDispatchToProps = dispatch => {
+  return {
+    clearAlerts: () => dispatch(alertActions.clear())
+  }
+}
+
+export default connect(null, mapDispatchToProps)(App)
