@@ -3,7 +3,11 @@ import { connect } from 'react-redux'
 import { Router, Route, Switch } from 'react-router-dom'
 
 import { history } from './helpers/history'
+import { alertActions } from './actions/alertActions'
 
+import { Welcome, Signup, Login } from './components/prelogin'
+
+import { PrivateRoute, PrivateRoutesContainer } from './components/PrivateRoute'
 
 import './App.css';
 

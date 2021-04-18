@@ -4,8 +4,29 @@ import { connect } from 'react-redux'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 
-import Alerts from './Alerts'
-import InputError from './InputError'
+import { Alert, InputError } from '../common'
 
-import { userActions } from '../Actions/userActions'
+import { userActions } from 'actions/userActions'
 import { validateSignup } from '../validators/signupValidators'
+
+class Signup extends Component {
+
+  render() {
+
+  }
+
+}
+
+const mapStateToProps = state => {
+  return {
+
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup)
