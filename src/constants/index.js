@@ -1,2 +1,2 @@
-export { alertConstants } from './alertConstants'
-export { userConstants } from './userConstants'
+export * from './alertConstants'
+export * from './userConstants'
