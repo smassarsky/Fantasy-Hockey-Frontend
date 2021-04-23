@@ -8,7 +8,7 @@ import './index.css';
 
 import App from './App';
 
-import { store } from './helpers/store'
+import { store } from 'helpers/store'
 
 import reportWebVitals from './reportWebVitals';
 

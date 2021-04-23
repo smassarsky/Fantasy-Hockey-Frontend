@@ -6,8 +6,8 @@ import Button from 'react-bootstrap/Button'
 
 import { Alert, InputError } from 'components/common'
 
-import { userActions } from 'actions/userActions'
-import { validateSignup } from 'validators/signupValidators'
+import { userActions } from 'actions'
+import { validateSignup } from 'validators'
 
 class Signup extends Component {
 
@@ -37,7 +37,7 @@ class Signup extends Component {
     return(
       <div className="h-100 login-styling">
         <Form onSubmit={this.handleSubmit} className="form-signin text-center">
-          <h3 className="mb-3 font-weight-normal">Login</h3>
+          <h3 className="mb-3 font-weight-normal">Sign Up</h3>
 
           <Alert />
 
@@ -112,18 +112,17 @@ class Signup extends Component {
       </div>
     )
   }
-
 }
 
 const mapStateToProps = state => {
   return {
-
+    signingUp: state.signingUp
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-
+    signup: fields => dispatch(userActions.signup(fields))
   }
 }
 

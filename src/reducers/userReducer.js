@@ -1,4 +1,4 @@
-import { userConstants } from '../constants'
+import { userConstants } from 'reduxConstants'
 
 let user = JSON.parse(localStorage.getItem('user'))
 
