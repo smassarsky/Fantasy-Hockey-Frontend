@@ -20,7 +20,7 @@ function signup(fields) {
         user => {
           dispatch(success(user))
           localStorage.setItem('user', JSON.stringify(user))
-          history.pushState('/dashboard')
+          history.push('/dashboard')
         },
         error => {
           dispatch(failure())
@@ -43,13 +43,11 @@ function login(username, password) {
     userService.login(username, password)
       .then(
         user => {
-          console.log('success')
-          dispatch(success(user))
-          localStorage.setItem('user', JSON.stringify(user))
+          dispatch(success(user.data))
+          localStorage.setItem('user', JSON.stringify(user.data))
           history.push('dashboard')
         },
         error => {
-          console.log('failure')
           dispatch(failure(error))
           dispatch(alertActions.error(error))
         }
@@ -62,9 +60,40 @@ function login(username, password) {
 }
 
 function logout() {
-
+  return dispatch => {
+    dispatch({ type: userConstants.LOGOUT })
+    userService.logout()
+      .then(
+        () => {
+          localStorage.removeItem('user')
+          history.push('/')
+        },
+        error => {
+          dispatch(alertActions.error(error))
+        }
+      )
+  }
 }
 
+
 function dashboard() {
-  
+  return dispatch => {
+    dispatch(request())
+    dispatch(alertActions.clear())
+
+    userService.dashboard()
+      .then(
+        resp => {
+          dispatch(success(resp))
+        },
+        error => {
+          dispatch(failure())
+          dispatch(alertActions.error(error))
+        }
+      )
+  }
+
+  function request() { return { type: userConstants.DASHBOARD_REQUEST } }
+  function success(resp) { return { type: userConstants.DASHBOARD_SUCCESS, resp } }
+  function failure() { return { type: userConstants.DASHBOARD_FAILURE } }
 }

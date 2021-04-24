@@ -38,9 +38,14 @@ function login(username, password) {
 }
 
 function logout() {
-
+  const options = {
+    method: 'DELETE',
+    credentials: 'include'
+  }
+  return fetch(`${baseUrl}/logout`, options)
 }
 
 function dashboard() {
-  
+  return fetch(`${baseUrl}/dashboard`, {credentials: 'include'})
+    .then(handleResponse)
 }
