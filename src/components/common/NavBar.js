@@ -24,8 +24,8 @@ class NavigationBar extends Component {
         <Navbar.Toggle aria-controls="navbar-collapse" />
         <Navbar.Collapse id="navbar-collapse">
           <Nav className="mr-auto">
-            <LinkContainer to='/teams'>
-              <Nav.Link>Teams</Nav.Link> 
+            <LinkContainer to='/matchups'>
+              <Nav.Link>Matchups</Nav.Link> 
             </LinkContainer>
           </Nav>
           <Nav>

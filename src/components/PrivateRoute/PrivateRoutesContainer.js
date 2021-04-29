@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import Navbar from '../common/NavBar'
+import { NavBar } from 'components/common'
+import { Dashboard } from 'components/Dashboard'
 
 class PrivateRoutesContainer extends Component {
 
   render() {
     return (
       <>
-        <Navbar />
+        <NavBar />
         <Switch>
-          {/* <Route exact path={'/dashboard'} component={Dashboard} /> */}
+          <Route exact path={'/dashboard'} component={Dashboard} />
         </Switch>
       </>
     )
