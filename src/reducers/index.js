@@ -1,0 +1,1 @@
+export { matchupsReducer } from './matchupsReducer'

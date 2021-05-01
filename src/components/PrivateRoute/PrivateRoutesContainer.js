@@ -3,6 +3,8 @@ import { Switch, Route } from 'react-router-dom'
 
 import { NavBar } from 'components/common'
 import { Dashboard } from 'components/Dashboard'
+import { MatchupIndex } from 'components/MatchupIndex'
+import { MatchupShow } from 'components/MatchupShow'
 
 class PrivateRoutesContainer extends Component {
 
@@ -12,6 +14,8 @@ class PrivateRoutesContainer extends Component {
         <NavBar />
         <Switch>
           <Route exact path={'/dashboard'} component={Dashboard} />
+          <Route exact path={'/matchups'} component={MatchupIndex} />
+          <Route path={'/matchups/:matchupId'} component={MatchupShow} />
         </Switch>
       </>
     )
