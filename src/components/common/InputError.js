@@ -1,19 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-class InputError extends Component {
+const InputError = ({ message }) => {
 
-  renderDiv() {
-    return <div className="text-danger">{this.props.message}</div>
+  const renderDiv = () => {
+    return <div className="text-danger">{message}</div>
   }
 
-  render() {
-    return (
-      <>
-        { this.props.message ? this.renderDiv() : null }
-      </>
-    )
-  }
-
+  return message ? renderDiv() : null
 }
 
 export default InputError

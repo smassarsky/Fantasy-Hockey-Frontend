@@ -2,7 +2,7 @@ import React from 'react'
 
 import Button from 'react-bootstrap/Button'
 
-const MatchupsHeader = props => {
+const MatchupsHeader = ({ showCreate, showJoin }) => {
   return (
     <div className="my-3">
       <h2>Matchups</h2>
@@ -12,6 +12,7 @@ const MatchupsHeader = props => {
           type="button"
           size="sm"
           className="mx-2"
+          onClick={showCreate}
         >
           Create a Matchup
         </Button>
