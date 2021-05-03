@@ -29,7 +29,7 @@ export function matchupsReducer(state, action) {
       return {
         ...state,
         fetching: false,
-        matchups: [...state.matchups, action.matchup]
+        matchups: [...state.matchups, action.json.data]
       }
     case matchupsConstants.CREATE_FAILURE:
       return {
