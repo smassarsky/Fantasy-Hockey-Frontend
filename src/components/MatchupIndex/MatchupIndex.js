@@ -5,11 +5,13 @@ import { matchupsReducer } from 'reducers'
 import { matchupsConstants } from 'reduxConstants'
 
 import { MatchupsHeader, MatchupsTable } from './components'
-import { NewModal, EditModal, DestroyModal } from './modals'
+import { NewModal, DestroyModal } from './modals'
 
 import { AlertMessage } from 'components/common'
 
 import { handleResponse } from 'helpers'
+
+import { EditModal } from './modals/MatchupForm'
 
 export const matchupsInitialState = {
   matchups: [],
@@ -23,14 +25,28 @@ const serverMessageInitialState = { type: null, message: null }
 const MatchupIndex = props => {
 
   const [ matchupStore, dispatch ] = useReducer(matchupsReducer, matchupsInitialState)
+
   const [ serverMessage, setServerMessage ] = useState(serverMessageInitialState)
+  const setError = error => {
+    setServerMessage({ type: 'failure', message: error.message || error })
+  }
+  const setSuccess = success => {
+    setServerMessage({ type: 'success', message: success.message || success })
+  }
 
   const [ newModal, setShowNew ] = useState(false)
   const showNew = () => setShowNew(true)
   const hideNew = () => setShowNew(false)
 
+  const [ editModal, setEditModal ] = useState({ show: false, matchup: null })
+  const showEdit = matchup => setEditModal({ show: true, matchup })
+  const hideEdit = () => setEditModal({ show: false, matchup: null })
+
+  const clearMessages = () => setServerMessage(serverMessageInitialState)
+
   const create = fields => {
     dispatch({ type: matchupsConstants.CREATE_REQUEST })
+    clearMessages()
     const options = {
       method: "POST",
       headers: {
@@ -47,8 +63,32 @@ const MatchupIndex = props => {
       })
   }
 
+  const update = fields => {
+    dispatch({ type: matchupsConstants.UPDATE_REQUEST })
+    clearMessages()
+    const options = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      credentials: "include",
+      body: JSON.stringify({ matchup: { id: editModal.matchup.id, fields }})
+    }
+    fetch(`${baseUrl}/matchups/${fields.id}`, options)
+      .then(resp => resp.json())
+      .then(json => {
+        dispatch({ type: matchupsConstants.UPDATE_SUCCESS, json })
+      },
+      error => {
+        dispatch({ type: matchupsConstants.UPDATE_FAILURE })
+        setError(error)
+      })
+  }
+
   useEffect(() => {
     dispatch({ type: matchupsConstants.INDEX_REQUEST })
+    clearMessages()
     fetch(`${baseUrl}/matchups`, { credentials: 'include' })
       .then(handleResponse)
       .then(json => {
@@ -77,6 +117,7 @@ const MatchupIndex = props => {
       />
       <MatchupsTable 
         matchups={matchupStore.matchups}
+        showEdit={showEdit}
       />
 
     <NewModal
@@ -84,6 +125,14 @@ const MatchupIndex = props => {
       hide={hideNew}
       teams={matchupStore.teams}
       create={create}
+    />
+
+    <EditModal
+      show={editModal.show}
+      hide={hideEdit}
+      teams={matchupStore.teams}
+      submitAction={update}
+      matchup={editModal.matchup}
     />
 
 

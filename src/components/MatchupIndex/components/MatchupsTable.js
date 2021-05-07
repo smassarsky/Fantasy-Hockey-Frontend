@@ -1,8 +1,15 @@
 import React from 'react'
 
 import Table from 'react-bootstrap/Table'
+import Button from 'react-bootstrap/Button'
 
-const MatchupsTable = ({ matchups }) => {
+import { LinkContainer } from 'react-router-bootstrap'
+
+import { dateFormatter } from 'helpers'
+
+const MatchupsTable = ({ matchups, showEdit, showDestroy }) => {
+
+  const userId = JSON.parse(localStorage.getItem('user')).id
 
   const renderTable = () => {
     return (
@@ -22,16 +29,45 @@ const MatchupsTable = ({ matchups }) => {
 
         <tbody>
           {matchups.map(matchup => {
-            const { name, team, owner, startDate, endDate, status } = matchup.attributes
+            const { id, attributes: { name, team, owner, startDate, endDate, status } } = matchup
             return (
-              <tr>
+              <tr key={id}>
                 <td>{name}</td>
-                <td>{team}</td>
-                <td>{owner}</td>
-                <td>{startDate}</td>
-                <td>{endDate}</td>
+                <td>{team.name}</td>
+                <td>{owner.name}</td>
+                <td>{dateFormatter.toDate(startDate)}</td>
+                <td>{dateFormatter.toDate(endDate)}</td>
                 <td>{status}</td>
-                <td>Actions TODO</td>
+                <td>
+                  <LinkContainer to={`/matchups/${id}`} >
+                    <Button
+                      className="mx-2"
+                      variant="primary"
+                      size="sm"
+                    >
+                      Show
+                    </Button>
+                  </LinkContainer>
+
+
+                  <Button
+                    className="mx-2"
+                    variant="success"
+                    size="sm"
+                    onClick={() => showEdit(matchup)}
+                  >
+                    Edit
+                  </Button>
+
+                  <Button
+                    className="mx-2"
+                    variant="danger"
+                    size="sm"
+                  >
+                    Delete
+                  </Button>
+
+                </td>
               </tr>
             )
           })}           

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { validateMatchup } from 'validators'
 
@@ -9,26 +9,41 @@ import Button from 'react-bootstrap/Button'
 
 import { InputError } from 'components/common'
 
-const EditModal = (props) => {
+import { dateFormatter } from 'helpers'
 
-  const  { show, hide, matchup, teams, update } =  props
+const initialFieldsState = {
+  teamId: '',
+  name: '',
+  startDate: '',
+  endDate: '',
+}
 
-  const [ fields, setFields ] = useState({
-    matchupId: '',
-    teamId: '',
-    name: '',
-    startDate: '',
-    endDate: ''
-  })
+export const EditModal = props => {
+  return <MatchupForm 
+    {...props}
+    verb={'Update'}
+  />
+}
 
-  const [ errors, setErrors ] = useState({})
+export const NewModal = props => {
+  return <MatchupForm
+    {...props}
+    verb={'Create'}
+  />
+}
+
+const MatchupForm = ({ show, hide, teams, verb, submitAction, matchup }) => {
+
+  const [fields, setFields] = useState(initialFieldsState)
+
+  const [errors, setErrors] = useState({})
 
   const handleSubmit = e => {
     e.preventDefault()
     const tempErrors = validateMatchup(fields)
     setErrors(tempErrors)
     if (Object.keys(tempErrors).length === 0) {
-      update(fields)
+      submitAction(fields)
     }
   }
 
@@ -38,6 +53,16 @@ const EditModal = (props) => {
 
   useEffect(() => {
     console.log(matchup)
+    if (matchup) {
+      setFields({
+        teamId: matchup.attributes.team.id,
+        name: matchup.attributes.name,
+        startDate: dateFormatter.toDateInputStr(matchup.attributes.startDate),
+        endDate: dateFormatter.toDateInputStr(matchup.attributes.endDate)
+      })
+    } else {
+      setFields(initialFieldsState)
+    }
   }, [matchup])
 
   console.log(fields)
@@ -73,7 +98,7 @@ const EditModal = (props) => {
                 as="select"
                 name="teamId"
                 onChange={handleChange}
-                value={fields.team}
+                value={fields.teamId}
               >
                 <option value="">Pick a Team...</option>
                 {teams.map(team => {
@@ -121,7 +146,7 @@ const EditModal = (props) => {
               variant="primary"
               type="submit"
             >
-              Create Matchup
+              {verb} Matchup
             </Button>            
           </Form.Row>
         </Form>
@@ -130,4 +155,4 @@ const EditModal = (props) => {
   )
 }
 
-export default EditModal
+export default MatchupForm
