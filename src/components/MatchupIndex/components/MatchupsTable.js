@@ -63,6 +63,7 @@ const MatchupsTable = ({ matchups, showEdit, showDestroy }) => {
                     className="mx-2"
                     variant="danger"
                     size="sm"
+                    onClick={() => showDestroy(matchup)}
                   >
                     Delete
                   </Button>

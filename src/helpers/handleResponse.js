@@ -8,9 +8,9 @@ export function handleResponse(response) {
         history.push('/login')
         return Promise.reject({ status: response.status })
       }
-      const error = json.error || response.statusText
-      console.log(error, json.error, response.statusText)
-      return Promise.reject({ error })
+      const message = json.message || response.statusText
+      console.log(json)
+      return Promise.reject({ message, fields: json.fields })
     }
     return json
   })

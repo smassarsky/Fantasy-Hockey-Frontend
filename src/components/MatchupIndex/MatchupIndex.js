@@ -5,13 +5,13 @@ import { matchupsReducer } from 'reducers'
 import { matchupsConstants } from 'reduxConstants'
 
 import { MatchupsHeader, MatchupsTable } from './components'
-import { NewModal, DestroyModal } from './modals'
+import { DestroyModal } from './modals'
 
 import { AlertMessage } from 'components/common'
 
 import { handleResponse } from 'helpers'
 
-import { EditModal } from './modals/MatchupForm'
+import { NewModal, EditModal } from './modals/MatchupForm'
 
 export const matchupsInitialState = {
   matchups: [],
@@ -28,6 +28,7 @@ const MatchupIndex = props => {
 
   const [ serverMessage, setServerMessage ] = useState(serverMessageInitialState)
   const setError = error => {
+    console.log(error)
     setServerMessage({ type: 'failure', message: error.message || error })
   }
   const setSuccess = success => {
@@ -36,13 +37,31 @@ const MatchupIndex = props => {
 
   const [ newModal, setShowNew ] = useState(false)
   const showNew = () => setShowNew(true)
-  const hideNew = () => setShowNew(false)
+  const hideNew = () => {
+    setShowNew(false)
+    clearFormErrors()
+  }
 
   const [ editModal, setEditModal ] = useState({ show: false, matchup: null })
   const showEdit = matchup => setEditModal({ show: true, matchup })
-  const hideEdit = () => setEditModal({ show: false, matchup: null })
+  const hideEdit = () => {
+    setEditModal({ show: false, matchup: null })
+    clearFormErrors()
+  }
 
-  const clearMessages = () => setServerMessage(serverMessageInitialState)
+  const [ destroyModal, setDestroyModal ] = useState({ show: false, matchup: null })
+  const showDestroy = matchup => setDestroyModal({ show: true, matchup })
+  const hideDestroy = () => setDestroyModal({ show: false, matchup: null })
+
+  const [ formErrors, setFormErrors ] = useState({})
+  const setEditErrors = errors => setFormErrors({ edit: errors })
+  const setNewErrors = errors => setFormErrors({ new: errors })
+  const clearFormErrors = () => setFormErrors({})
+
+  const clearMessages = () => {
+    setServerMessage(serverMessageInitialState)
+    clearFormErrors()
+  }
 
   const create = fields => {
     dispatch({ type: matchupsConstants.CREATE_REQUEST })
@@ -57,9 +76,18 @@ const MatchupIndex = props => {
       body: JSON.stringify({ matchup: fields })
     }
     fetch(`${baseUrl}/matchups`, options)
-      .then(resp => resp.json())
+      .then(handleResponse)
       .then(json => {
         dispatch({ type: matchupsConstants.CREATE_SUCCESS, json })
+        setSuccess("Matchup Created")
+        hideNew()
+      },
+      error => {
+        dispatch({ type: matchupsConstants.CREATE_FAILURE })
+        if (error.fields) {
+          setNewErrors(error.fields)
+        }
+        setError(error.message)
       })
   }
 
@@ -73,16 +101,47 @@ const MatchupIndex = props => {
         Accept: 'application/json'
       },
       credentials: "include",
-      body: JSON.stringify({ matchup: { id: editModal.matchup.id, fields }})
+      body: JSON.stringify({ matchup: { id: editModal.matchup.id, ...fields }})
     }
-    fetch(`${baseUrl}/matchups/${fields.id}`, options)
-      .then(resp => resp.json())
+    fetch(`${baseUrl}/matchups/${editModal.matchup.id}`, options)
+      .then(handleResponse)
       .then(json => {
-        dispatch({ type: matchupsConstants.UPDATE_SUCCESS, json })
+        dispatch({ type: matchupsConstants.UPDATE_SUCCESS, matchup: json.data })
+        hideEdit()
       },
       error => {
-        dispatch({ type: matchupsConstants.UPDATE_FAILURE })
-        setError(error)
+        if (error.status !== 401) {
+          dispatch({ type: matchupsConstants.UPDATE_FAILURE })
+          if (error.fields) {
+            setEditErrors(error.fields)
+          }
+          setError(error.message)
+        }
+      })
+  }
+
+  const destroy = matchupId => {
+    dispatch({ type: matchupsConstants.DESTROY_REQUEST})
+    clearMessages()
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      credentials: "include"
+    }
+    fetch(`${baseUrl}/matchups/${matchupId}`, options)
+      .then(handleResponse)
+      .then(json => {
+        dispatch({ type: matchupsConstants.DESTROY_SUCCESS, matchupId })
+        hideDestroy()
+      },
+      error => {
+        if (error.status !== 401) {
+          dispatch({ type: matchupsConstants.DESTROY_FAILURE })
+          hideDestroy()
+        }
       })
   }
 
@@ -92,13 +151,12 @@ const MatchupIndex = props => {
     fetch(`${baseUrl}/matchups`, { credentials: 'include' })
       .then(handleResponse)
       .then(json => {
-        console.log('json resp', json)
         dispatch({ type: matchupsConstants.INDEX_SUCCESS, json })
-      })
-      .catch(({ error, status }) => {
-        console.log('hi from catch', error, status)
-        if (status !== 401) {
-          setServerMessage({ type: 'failure', message: error.message || error })
+      },
+      error => {
+        if (error.status !== 401) {
+          dispatch({ type: matchupsConstants.INDEX_FAILURE })
+          setError(error.message)
         }
       })
   }, [])
@@ -118,23 +176,32 @@ const MatchupIndex = props => {
       <MatchupsTable 
         matchups={matchupStore.matchups}
         showEdit={showEdit}
+        showDestroy={showDestroy}
       />
 
-    <NewModal
-      show={newModal}
-      hide={hideNew}
-      teams={matchupStore.teams}
-      create={create}
-    />
+      <NewModal
+        show={newModal}
+        hide={hideNew}
+        teams={matchupStore.teams}
+        submitAction={create}
+        errors={formErrors.new}
+      />
 
-    <EditModal
-      show={editModal.show}
-      hide={hideEdit}
-      teams={matchupStore.teams}
-      submitAction={update}
-      matchup={editModal.matchup}
-    />
+      <EditModal
+        show={editModal.show}
+        hide={hideEdit}
+        teams={matchupStore.teams}
+        submitAction={update}
+        matchup={editModal.matchup}
+        errors={formErrors.edit}
+      />
 
+      <DestroyModal
+        show={destroyModal.show}
+        hide={hideDestroy}
+        matchup={destroyModal.matchup}
+        destroy={destroy}
+      />
 
     </div>
   )

@@ -32,7 +32,9 @@ export const NewModal = props => {
   />
 }
 
-const MatchupForm = ({ show, hide, teams, verb, submitAction, matchup }) => {
+const MatchupForm = ({ show, hide, teams, verb, submitAction, matchup, errors: serverError }) => {
+
+  console.log(serverError)
 
   const [fields, setFields] = useState(initialFieldsState)
 
@@ -47,9 +49,7 @@ const MatchupForm = ({ show, hide, teams, verb, submitAction, matchup }) => {
     }
   }
 
-  const handleChange = e => {
-    setFields({ ...fields, [e.target.name]: e.target.value })
-  }
+  const handleChange = e => setFields({ ...fields, [e.target.name]: e.target.value })
 
   useEffect(() => {
     console.log(matchup)
@@ -64,6 +64,10 @@ const MatchupForm = ({ show, hide, teams, verb, submitAction, matchup }) => {
       setFields(initialFieldsState)
     }
   }, [matchup])
+
+  useEffect(() => {
+    setErrors(serverError || {})
+  }, [serverError])
 
   console.log(fields)
 
