@@ -15,7 +15,7 @@ class PrivateRoutesContainer extends Component {
         <Switch>
           <Route exact path={'/dashboard'} component={Dashboard} />
           <Route exact path={'/matchups'} component={MatchupIndex} />
-          <Route path={'/matchups/:matchupId'} component={MatchupShow} />
+          <Route exact path={'/matchups/:matchupId'} component={MatchupShow} />
         </Switch>
       </>
     )
